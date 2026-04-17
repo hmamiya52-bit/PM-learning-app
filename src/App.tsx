@@ -5,6 +5,7 @@ import Afternoon1Problems from './pages/Afternoon1Problems'
 import Afternoon1Practice from './pages/Afternoon1Practice'
 import Afternoon1Answer from './pages/Afternoon1Answer'
 import Notes from './pages/Notes'
+import NoteDetail from './pages/NoteDetail'
 import Quiz from './pages/Quiz'
 
 export default function App() {
@@ -17,6 +18,7 @@ export default function App() {
           <Route path="/afternoon1/:id/practice" element={<Afternoon1Practice />} />
           <Route path="/afternoon1/:id/answer" element={<Afternoon1Answer />} />
           <Route path="/notes" element={<Notes />} />
+          <Route path="/notes/:categoryId" element={<NoteDetail />} />
           <Route path="/quiz" element={<Quiz />} />
         </Route>
       </Routes>

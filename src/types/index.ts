@@ -78,16 +78,8 @@ export type NoteCategory =
   | 'agile'           // アジャイル/ハイブリッド
   | 'exam'            // 試験対策Tips
 
-export interface Note {
-  id: string
-  category: NoteCategory
-  title: string
-  content: string       // プレーンテキスト（改行保持）
-  tags: string[]
-  seed?: boolean        // アプリ同梱のシードノートか
-  createdAt: string     // ISO
-  updatedAt: string     // ISO
-}
+// NOTE: 構造化ノート（セクション＋==赤字==マーク）本体は
+// src/data/noteContent.ts の NoteData / NoteSection を参照。
 
 // ------------------------------------------------------------
 // クイズ

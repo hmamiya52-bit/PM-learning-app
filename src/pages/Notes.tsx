@@ -1,7 +1,6 @@
-import { useMemo, useState, useCallback } from 'react'
-import type { Note, NoteCategory } from '../types'
-import { NOTE_CATEGORIES, getCategoryMeta } from '../data/noteCategories'
-import { loadAllNotes, addNote, updateNote, deleteNote } from '../lib/notes'
+import { Link } from 'react-router-dom'
+import { NOTE_CATEGORIES } from '../data/noteCategories'
+import { NOTE_DB } from '../data/noteContent'
 
 const THEME = {
   primary: '#7B2D5F',
@@ -11,372 +10,116 @@ const THEME = {
   bgSoft: '#FAF5F8',
 }
 
-type CategoryFilter = NoteCategory | 'all'
+// カテゴリごとのアクセントバリエーション（見た目の変化付け）
+const CARD_COLORS: Array<{ bg: string; fg: string }> = [
+  { bg: '#FAF5F8', fg: '#7B2D5F' }, // primary
+  { bg: '#F0F6FF', fg: '#1d4ed8' }, // blue
+  { bg: '#ECFDF5', fg: '#059669' }, // emerald
+  { bg: '#FEF3C7', fg: '#B45309' }, // amber
+  { bg: '#F3E8FF', fg: '#7e22ce' }, // purple
+  { bg: '#FEE2E2', fg: '#b91c1c' }, // red
+  { bg: '#E0F2FE', fg: '#0369a1' }, // sky
+  { bg: '#FFE4E6', fg: '#be123c' }, // rose
+  { bg: '#ECFEFF', fg: '#0e7490' }, // cyan
+]
 
-// ----------------------------------------------------------------
-// 編集モーダル
-// ----------------------------------------------------------------
-interface EditorProps {
-  note?: Note   // undefined → 新規作成
-  defaultCategory: NoteCategory
-  onSave: () => void
-  onCancel: () => void
-}
-
-function NoteEditor({ note, defaultCategory, onSave, onCancel }: EditorProps) {
-  const [title, setTitle] = useState(note?.title ?? '')
-  const [content, setContent] = useState(note?.content ?? '')
-  const [category, setCategory] = useState<NoteCategory>(note?.category ?? defaultCategory)
-  const [tagsText, setTagsText] = useState((note?.tags ?? []).join(', '))
-
-  const handleSubmit = () => {
-    const tags = tagsText
-      .split(',')
-      .map((t) => t.trim())
-      .filter(Boolean)
-    if (note) {
-      updateNote(note.id, { title, content, category, tags })
-    } else {
-      addNote({ title, content, category, tags })
-    }
-    onSave()
-  }
-
+function IconBook() {
   return (
-    <div
-      className="fixed inset-0 z-40 flex items-center justify-center px-3"
-      style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}
-      onClick={onCancel}
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      className="w-5 h-5"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      strokeWidth={2}
+      aria-hidden="true"
     >
-      <div
-        className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* ヘッダ */}
-        <div
-          className="px-4 py-2.5 flex items-center justify-between text-white rounded-t-lg"
-          style={{ backgroundColor: THEME.primary }}
-        >
-          <h2 className="text-sm font-bold">
-            {note ? 'ノートを編集' : '新しいノート'}
-          </h2>
-          <button
-            onClick={onCancel}
-            className="text-white/80 hover:text-white text-xs"
-            aria-label="閉じる"
-          >
-            ✕
-          </button>
-        </div>
-
-        {/* 本体 */}
-        <div className="p-4 space-y-3 overflow-y-auto">
-          <div>
-            <label className="block text-xs font-semibold text-slate-600 mb-1">
-              カテゴリ
-            </label>
-            <select
-              value={category}
-              onChange={(e) => setCategory(e.target.value as NoteCategory)}
-              className="w-full text-sm border border-slate-300 rounded px-2 py-1.5 focus:outline-none focus:ring-2"
-              style={{ outlineColor: THEME.primary }}
-            >
-              {NOTE_CATEGORIES.map((c) => (
-                <option key={c.key} value={c.key}>
-                  {c.label}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="block text-xs font-semibold text-slate-600 mb-1">
-              タイトル
-            </label>
-            <input
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="例: リスク対応戦略（Avoid / Transfer / Mitigate / Accept）"
-              className="w-full text-sm border border-slate-300 rounded px-2 py-1.5 focus:outline-none focus:ring-2"
-              style={{ outlineColor: THEME.primary }}
-            />
-          </div>
-          <div>
-            <label className="block text-xs font-semibold text-slate-600 mb-1">
-              本文
-            </label>
-            <textarea
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              rows={10}
-              placeholder="箇条書き・Markdown風記法もそのまま保存されます"
-              className="w-full text-sm border border-slate-300 rounded px-2 py-1.5 font-mono focus:outline-none focus:ring-2"
-              style={{ outlineColor: THEME.primary }}
-            />
-          </div>
-          <div>
-            <label className="block text-xs font-semibold text-slate-600 mb-1">
-              タグ（カンマ区切り）
-            </label>
-            <input
-              type="text"
-              value={tagsText}
-              onChange={(e) => setTagsText(e.target.value)}
-              placeholder="例: リスク, Avoid, Transfer"
-              className="w-full text-sm border border-slate-300 rounded px-2 py-1.5 focus:outline-none focus:ring-2"
-              style={{ outlineColor: THEME.primary }}
-            />
-          </div>
-        </div>
-
-        {/* フッタ */}
-        <div className="px-4 py-3 border-t border-slate-200 flex justify-end gap-2">
-          <button
-            onClick={onCancel}
-            className="text-xs font-semibold px-3 py-1.5 rounded border border-slate-300 text-slate-600 hover:bg-slate-50"
-          >
-            キャンセル
-          </button>
-          <button
-            onClick={handleSubmit}
-            disabled={!title.trim() || !content.trim()}
-            className="text-xs font-semibold px-3 py-1.5 rounded text-white hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed"
-            style={{ backgroundColor: THEME.primary }}
-          >
-            保存
-          </button>
-        </div>
-      </div>
-    </div>
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+      />
+    </svg>
   )
 }
 
-// ----------------------------------------------------------------
-// Notes ページ本体
-// ----------------------------------------------------------------
-export default function Notes() {
-  const [notes, setNotes] = useState<Note[]>(() => loadAllNotes())
-  const [filter, setFilter] = useState<CategoryFilter>('all')
-  const [keyword, setKeyword] = useState('')
-  const [editing, setEditing] = useState<{ mode: 'new' | 'edit'; note?: Note } | null>(null)
-  const [expandedId, setExpandedId] = useState<string | null>(null)
-
-  const reload = useCallback(() => {
-    setNotes(loadAllNotes())
-    setEditing(null)
-  }, [])
-
-  const filtered = useMemo(() => {
-    const kw = keyword.trim().toLowerCase()
-    return notes.filter((n) => {
-      if (filter !== 'all' && n.category !== filter) return false
-      if (kw) {
-        const hit =
-          n.title.toLowerCase().includes(kw) ||
-          n.content.toLowerCase().includes(kw) ||
-          n.tags.some((t) => t.toLowerCase().includes(kw))
-        if (!hit) return false
-      }
-      return true
-    })
-  }, [notes, filter, keyword])
-
-  const categoryCounts = useMemo(() => {
-    const map = new Map<NoteCategory, number>()
-    for (const n of notes) {
-      map.set(n.category, (map.get(n.category) ?? 0) + 1)
-    }
-    return map
-  }, [notes])
-
-  const handleDelete = (id: string) => {
-    if (!window.confirm('このノートを削除しますか？（シードノートは非表示になります）')) return
-    deleteNote(id)
-    reload()
-  }
-
+function IconArrowRight() {
   return (
-    <div className="max-w-5xl mx-auto px-4 py-5">
-      {/* ===== ヘッダ ===== */}
-      <header className="mb-4 flex items-start justify-between gap-3 flex-wrap">
-        <div>
-          <h1 className="text-xl sm:text-2xl font-bold" style={{ color: THEME.primaryDark }}>
-            ノート（知識整理）
-          </h1>
-          <p className="text-xs text-slate-500 mt-1">
-            PMBOK 10知識エリア＋横断トピックごとに、要点をストックして試験対策に使えます。
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      className="w-4 h-4"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      strokeWidth={2}
+      aria-hidden="true"
+    >
+      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+    </svg>
+  )
+}
+
+export default function Notes() {
+  return (
+    <div className="min-h-screen" style={{ backgroundColor: THEME.bgSoft }}>
+      <div className="max-w-4xl mx-auto px-4 pb-16 pt-5">
+        {/* ===== ヘッダ ===== */}
+        <div className="mb-5">
+          <div className="flex items-center gap-2 mb-1" style={{ color: THEME.primary }}>
+            <IconBook />
+            <h1 className="text-xl sm:text-2xl font-black" style={{ color: THEME.primaryDark }}>
+              ノートモード
+            </h1>
+          </div>
+          <p className="text-xs text-slate-500">
+            PMBOK 10知識エリア＋横断トピックを1ページずつ確認。赤字は重要暗記ワード（「赤字を隠す」で暗記テスト）。
           </p>
         </div>
-        <button
-          onClick={() => setEditing({ mode: 'new' })}
-          className="text-xs font-semibold px-3 py-1.5 rounded text-white shadow-sm hover:opacity-90"
-          style={{ backgroundColor: THEME.primary }}
-        >
-          ＋ 新しいノート
-        </button>
-      </header>
 
-      {/* ===== カテゴリタブ ===== */}
-      <section className="mb-3">
-        <div className="flex flex-wrap gap-1.5">
-          <button
-            onClick={() => setFilter('all')}
-            className="text-xs font-semibold px-2.5 py-1 rounded-full transition-colors"
-            style={{
-              backgroundColor: filter === 'all' ? THEME.primary : '#ffffff',
-              color: filter === 'all' ? '#ffffff' : THEME.primary,
-              border: `1px solid ${THEME.accent}`,
-            }}
-          >
-            すべて ({notes.length})
-          </button>
-          {NOTE_CATEGORIES.map((c) => {
-            const n = categoryCounts.get(c.key) ?? 0
-            const active = filter === c.key
+        {/* ===== カテゴリグリッド ===== */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          {NOTE_CATEGORIES.map((cat, idx) => {
+            const color = CARD_COLORS[idx % CARD_COLORS.length]
+            const note = NOTE_DB[cat.key]
             return (
-              <button
-                key={c.key}
-                onClick={() => setFilter(c.key)}
-                className="text-xs font-semibold px-2.5 py-1 rounded-full transition-colors"
-                style={{
-                  backgroundColor: active ? THEME.primary : '#ffffff',
-                  color: active ? '#ffffff' : THEME.primary,
-                  border: `1px solid ${THEME.accent}`,
-                  opacity: n === 0 ? 0.5 : 1,
-                }}
+              <Link
+                key={cat.key}
+                to={`/notes/${cat.key}`}
+                className="group flex items-center gap-3 bg-white rounded-xl border px-4 py-3.5 hover:shadow-md transition-all focus:outline-none focus-visible:ring-2"
+                style={{ borderColor: THEME.accent }}
+                aria-label={`${cat.label}のノートを開く`}
               >
-                {c.label} ({n})
-              </button>
+                <div
+                  className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
+                  style={{ backgroundColor: color.bg, color: color.fg }}
+                >
+                  <IconBook />
+                </div>
+
+                <div className="flex-1 min-w-0">
+                  <p
+                    className="text-sm font-bold leading-snug truncate"
+                    style={{ color: THEME.primaryDark }}
+                  >
+                    {cat.label}
+                  </p>
+                  <p className="text-[11px] text-slate-500 mt-0.5 leading-snug line-clamp-2">
+                    {note?.summary ?? ''}
+                  </p>
+                </div>
+
+                <div className="text-slate-300 group-hover:text-slate-500 flex-shrink-0">
+                  <IconArrowRight />
+                </div>
+              </Link>
             )
           })}
         </div>
-      </section>
 
-      {/* ===== 検索 ===== */}
-      <section className="mb-3">
-        <input
-          type="search"
-          value={keyword}
-          onChange={(e) => setKeyword(e.target.value)}
-          placeholder="タイトル・本文・タグで検索"
-          className="w-full text-sm border border-slate-300 rounded px-3 py-1.5 focus:outline-none focus:ring-2"
-          style={{ outlineColor: THEME.primary }}
-        />
-      </section>
-
-      {/* ===== ノート一覧 ===== */}
-      <section>
-        {filtered.length === 0 ? (
-          <div className="rounded-lg bg-white border border-slate-200 px-4 py-8 text-center text-slate-400 text-sm">
-            条件に一致するノートがありません
-          </div>
-        ) : (
-          <ul className="space-y-2">
-            {filtered.map((n) => {
-              const meta = getCategoryMeta(n.category)
-              const expanded = expandedId === n.id
-              return (
-                <li
-                  key={n.id}
-                  className="rounded-lg bg-white border border-slate-200 shadow-sm overflow-hidden"
-                >
-                  {/* カード上部：常に表示 */}
-                  <button
-                    onClick={() => setExpandedId(expanded ? null : n.id)}
-                    className="w-full text-left px-3 py-2.5 hover:bg-slate-50 transition-colors"
-                  >
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span
-                        className="text-[10px] font-bold px-1.5 py-0.5 rounded"
-                        style={{
-                          color: THEME.primary,
-                          backgroundColor: THEME.bgSoft,
-                          border: `1px solid ${THEME.accent}`,
-                        }}
-                      >
-                        {meta.label}
-                      </span>
-                      {n.seed && (
-                        <span className="text-[9px] font-bold px-1 py-0.5 rounded bg-slate-100 text-slate-500">
-                          シード
-                        </span>
-                      )}
-                      <h3 className="text-sm font-bold text-slate-800 truncate flex-1">
-                        {n.title}
-                      </h3>
-                      <span className="text-[10px] text-slate-400">
-                        {expanded ? '▲' : '▼'}
-                      </span>
-                    </div>
-                    {!expanded && (
-                      <p className="mt-1 text-[11px] text-slate-500 line-clamp-2 leading-snug">
-                        {n.content.slice(0, 120)}
-                      </p>
-                    )}
-                  </button>
-
-                  {/* 展開時：本文＋操作 */}
-                  {expanded && (
-                    <div className="border-t border-slate-100 px-3 py-2.5">
-                      <pre className="text-xs text-slate-700 leading-relaxed whitespace-pre-wrap font-sans">
-                        {n.content}
-                      </pre>
-                      {n.tags.length > 0 && (
-                        <div className="mt-2 flex flex-wrap gap-1">
-                          {n.tags.map((t) => (
-                            <span
-                              key={t}
-                              className="text-[10px] px-1.5 py-0.5 rounded"
-                              style={{
-                                color: THEME.primaryDark,
-                                backgroundColor: THEME.bgSoft,
-                              }}
-                            >
-                              #{t}
-                            </span>
-                          ))}
-                        </div>
-                      )}
-                      <div className="mt-3 flex items-center justify-between flex-wrap gap-2">
-                        <p className="text-[10px] text-slate-400">
-                          更新: {new Date(n.updatedAt).toLocaleDateString()}
-                        </p>
-                        <div className="flex gap-1">
-                          <button
-                            onClick={() => setEditing({ mode: 'edit', note: n })}
-                            className="text-xs font-semibold px-2 py-1 rounded border hover:bg-slate-50"
-                            style={{ color: THEME.primary, borderColor: THEME.accent }}
-                          >
-                            編集
-                          </button>
-                          <button
-                            onClick={() => handleDelete(n.id)}
-                            className="text-xs font-semibold px-2 py-1 rounded border border-red-200 text-red-600 hover:bg-red-50"
-                          >
-                            {n.seed ? '非表示' : '削除'}
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </li>
-              )
-            })}
-          </ul>
-        )}
-        <p className="mt-3 text-[10px] text-slate-400">
-          {filtered.length} 件 / 全 {notes.length} 件
+        <p className="mt-4 text-[10px] text-slate-400">
+          {NOTE_CATEGORIES.length} カテゴリ
         </p>
-      </section>
-
-      {editing && (
-        <NoteEditor
-          note={editing.note}
-          defaultCategory={filter === 'all' ? 'integration' : filter}
-          onSave={reload}
-          onCancel={() => setEditing(null)}
-        />
-      )}
+      </div>
     </div>
   )
 }
