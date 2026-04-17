@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { VERSION_LABEL } from '../version'
 
 // ------------------------------------------------------------
@@ -74,7 +75,8 @@ interface Feature {
   title: string
   description: string
   icon: (cls: string) => React.ReactNode
-  status: 'coming-next' | 'planned'
+  status: 'available' | 'coming-next' | 'planned'
+  to?: string
 }
 
 const FEATURES: Feature[] = [
@@ -83,7 +85,8 @@ const FEATURES: Feature[] = [
     title: '午後I 演習',
     description: '過去5年分の午後I問題をタイマー付きで演習。模範解答と比較し自己採点',
     icon: (cls) => <IconFileText className={cls} />,
-    status: 'coming-next',
+    status: 'available',
+    to: '/afternoon1',
   },
   {
     phase: 'Phase 2',
@@ -218,57 +221,85 @@ export default function Home() {
               実装ロードマップ
             </h2>
             <span className="text-[11px] text-slate-500">
-              現在: <strong style={{ color: THEME.primary }}>Phase 0</strong>
+              現在: <strong style={{ color: THEME.primary }}>Phase 1</strong>
             </span>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
-            {FEATURES.map((f) => (
-              <article
-                key={f.title}
-                className="relative rounded-lg bg-white border border-slate-200 px-3 py-2 shadow-sm hover:shadow-md transition-shadow flex items-start gap-2.5"
-              >
-                {/* Icon (small, left) */}
-                <div
-                  className="w-8 h-8 rounded-md flex items-center justify-center flex-shrink-0"
-                  style={{ backgroundColor: THEME.bgSoft, color: THEME.primary }}
-                >
-                  {f.icon('w-4 h-4')}
-                </div>
-
-                {/* Body */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-1.5 mb-0.5">
-                    <span
-                      className="text-[9px] font-bold tracking-wider px-1.5 py-0.5 rounded"
-                      style={{
-                        color: THEME.primary,
-                        backgroundColor: THEME.bgSoft,
-                      }}
-                    >
-                      {f.phase.toUpperCase()}
-                    </span>
-                    {f.status === 'coming-next' && (
-                      <span
-                        className="text-[9px] font-bold px-1.5 py-0.5 rounded text-white"
-                        style={{ backgroundColor: THEME.primary }}
-                      >
-                        NEXT
-                      </span>
-                    )}
-                    <h3
-                      className="text-sm font-bold leading-tight truncate"
-                      style={{ color: THEME.primaryDark }}
-                    >
-                      {f.title}
-                    </h3>
+            {FEATURES.map((f) => {
+              const content = (
+                <>
+                  {/* Icon (small, left) */}
+                  <div
+                    className="w-8 h-8 rounded-md flex items-center justify-center flex-shrink-0"
+                    style={{ backgroundColor: THEME.bgSoft, color: THEME.primary }}
+                  >
+                    {f.icon('w-4 h-4')}
                   </div>
-                  <p className="text-[11px] text-slate-600 leading-snug">
-                    {f.description}
-                  </p>
-                </div>
-              </article>
-            ))}
+
+                  {/* Body */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-1.5 mb-0.5 flex-wrap">
+                      <span
+                        className="text-[9px] font-bold tracking-wider px-1.5 py-0.5 rounded"
+                        style={{
+                          color: THEME.primary,
+                          backgroundColor: THEME.bgSoft,
+                        }}
+                      >
+                        {f.phase.toUpperCase()}
+                      </span>
+                      {f.status === 'available' && (
+                        <span
+                          className="text-[9px] font-bold px-1.5 py-0.5 rounded text-white"
+                          style={{ backgroundColor: '#10b981' }}
+                        >
+                          NOW
+                        </span>
+                      )}
+                      {f.status === 'coming-next' && (
+                        <span
+                          className="text-[9px] font-bold px-1.5 py-0.5 rounded text-white"
+                          style={{ backgroundColor: THEME.primary }}
+                        >
+                          NEXT
+                        </span>
+                      )}
+                      <h3
+                        className="text-sm font-bold leading-tight truncate"
+                        style={{ color: THEME.primaryDark }}
+                      >
+                        {f.title}
+                      </h3>
+                    </div>
+                    <p className="text-[11px] text-slate-600 leading-snug">
+                      {f.description}
+                    </p>
+                  </div>
+                </>
+              )
+              const base = 'relative rounded-lg border px-3 py-2 shadow-sm flex items-start gap-2.5 transition-all'
+              if (f.to) {
+                return (
+                  <Link
+                    key={f.title}
+                    to={f.to}
+                    className={`${base} bg-white border-slate-200 hover:shadow-md hover:-translate-y-0.5`}
+                    style={{ borderColor: THEME.accent }}
+                  >
+                    {content}
+                  </Link>
+                )
+              }
+              return (
+                <article
+                  key={f.title}
+                  className={`${base} bg-white border-slate-200`}
+                >
+                  {content}
+                </article>
+              )
+            })}
           </div>
         </section>
 
