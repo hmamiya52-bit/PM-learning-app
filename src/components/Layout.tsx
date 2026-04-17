@@ -106,8 +106,8 @@ const NAV_ITEMS: NavItem[] = [
   { label: '午後I 演習', to: '/afternoon1', icon: <IconFileText /> },
   { label: '午後II 論述', to: '/afternoon2', icon: <IconEdit />, disabled: true },
   { label: 'ネタ帳', to: '/episodes', icon: <IconLightbulb />, disabled: true },
-  { label: 'ノート', to: '/notes', icon: <IconBook />, disabled: true },
-  { label: 'クイズ', to: '/quiz', icon: <IconQuestion />, disabled: true },
+  { label: 'ノート', to: '/notes', icon: <IconBook /> },
+  { label: 'クイズ', to: '/quiz', icon: <IconQuestion /> },
   { label: '進捗トラッカー', to: '/tracker', icon: <IconChart />, disabled: true },
 ]
 

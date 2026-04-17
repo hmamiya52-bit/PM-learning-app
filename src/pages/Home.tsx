@@ -75,7 +75,7 @@ interface Feature {
   title: string
   description: string
   icon: (cls: string) => React.ReactNode
-  status: 'available' | 'coming-next' | 'planned'
+  status: 'available' | 'coming-next' | 'planned' | 'done'
   to?: string
 }
 
@@ -85,7 +85,7 @@ const FEATURES: Feature[] = [
     title: '午後I 演習',
     description: '過去5年分の午後I問題をタイマー付きで演習。模範解答と比較し自己採点',
     icon: (cls) => <IconFileText className={cls} />,
-    status: 'available',
+    status: 'done',
     to: '/afternoon1',
   },
   {
@@ -93,14 +93,16 @@ const FEATURES: Feature[] = [
     title: 'ノート（知識整理）',
     description: 'スコープ・リスク・品質管理などPMBOK知識をカテゴリ別に整理',
     icon: (cls) => <IconBook className={cls} />,
-    status: 'planned',
+    status: 'available',
+    to: '/notes',
   },
   {
     phase: 'Phase 2',
     title: 'クイズ',
     description: 'PM用語・フレームワークの択一クイズで知識を定着',
     icon: (cls) => <IconQuestion className={cls} />,
-    status: 'planned',
+    status: 'available',
+    to: '/quiz',
   },
   {
     phase: 'Phase 3',
@@ -221,7 +223,7 @@ export default function Home() {
               実装ロードマップ
             </h2>
             <span className="text-[11px] text-slate-500">
-              現在: <strong style={{ color: THEME.primary }}>Phase 1</strong>
+              現在: <strong style={{ color: THEME.primary }}>Phase 2</strong>
             </span>
           </div>
 
@@ -255,6 +257,14 @@ export default function Home() {
                           style={{ backgroundColor: '#10b981' }}
                         >
                           NOW
+                        </span>
+                      )}
+                      {f.status === 'done' && (
+                        <span
+                          className="text-[9px] font-bold px-1.5 py-0.5 rounded text-white"
+                          style={{ backgroundColor: THEME.primaryLight }}
+                        >
+                          DONE
                         </span>
                       )}
                       {f.status === 'coming-next' && (

@@ -55,3 +55,64 @@ export interface PracticeRecord {
  * 学習計画（問題に予定日を紐付け）
  */
 export type PlanMap = Record<string, string>  // problemId → 'YYYY-MM-DD'
+
+// ------------------------------------------------------------
+// ノート（知識整理）
+// ------------------------------------------------------------
+
+/**
+ * ノートカテゴリ（PMBOK知識エリア＋横断トピック）
+ */
+export type NoteCategory =
+  | 'integration'     // 統合管理
+  | 'scope'           // スコープ管理
+  | 'schedule'        // スケジュール管理
+  | 'cost'            // コスト管理
+  | 'quality'         // 品質管理
+  | 'resource'        // 資源管理
+  | 'communication'   // コミュニケーション管理
+  | 'risk'            // リスク管理
+  | 'procurement'     // 調達管理
+  | 'stakeholder'     // ステークホルダー管理
+  | 'process'         // プロセス/プロセス群
+  | 'agile'           // アジャイル/ハイブリッド
+  | 'exam'            // 試験対策Tips
+
+export interface Note {
+  id: string
+  category: NoteCategory
+  title: string
+  content: string       // プレーンテキスト（改行保持）
+  tags: string[]
+  seed?: boolean        // アプリ同梱のシードノートか
+  createdAt: string     // ISO
+  updatedAt: string     // ISO
+}
+
+// ------------------------------------------------------------
+// クイズ
+// ------------------------------------------------------------
+
+export type QuizDifficulty = 'easy' | 'normal' | 'hard'
+
+export interface QuizQuestion {
+  id: string
+  category: NoteCategory   // ノートと共通のカテゴリ
+  question: string
+  choices: string[]        // 4択想定
+  correctIndex: number
+  explanation: string
+  difficulty: QuizDifficulty
+}
+
+/**
+ * クイズの解答記録（1問ごと）
+ */
+export interface QuizAttempt {
+  id: string
+  quizId: string
+  date: string       // 'YYYY-MM-DD'
+  correct: boolean
+  pickedIndex: number
+  timeMs?: number
+}
