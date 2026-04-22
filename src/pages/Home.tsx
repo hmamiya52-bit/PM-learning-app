@@ -93,7 +93,7 @@ const FEATURES: Feature[] = [
     title: 'ノート（知識整理）',
     description: 'スコープ・リスク・品質管理などPMBOK知識をカテゴリ別に整理',
     icon: (cls) => <IconBook className={cls} />,
-    status: 'available',
+    status: 'done',
     to: '/notes',
   },
   {
@@ -101,7 +101,7 @@ const FEATURES: Feature[] = [
     title: 'クイズ',
     description: 'PM用語・フレームワークの択一クイズで知識を定着',
     icon: (cls) => <IconQuestion className={cls} />,
-    status: 'available',
+    status: 'done',
     to: '/quiz',
   },
   {
@@ -109,7 +109,8 @@ const FEATURES: Feature[] = [
     title: '進捗トラッカー',
     description: 'スコア履歴・学習計画を一元管理し成績推移を可視化',
     icon: (cls) => <IconChart className={cls} />,
-    status: 'planned',
+    status: 'available',
+    to: '/tracker',
   },
   {
     phase: 'Phase 4',
@@ -223,7 +224,7 @@ export default function Home() {
               実装ロードマップ
             </h2>
             <span className="text-[11px] text-slate-500">
-              現在: <strong style={{ color: THEME.primary }}>Phase 2</strong>
+              現在: <strong style={{ color: THEME.primary }}>Phase 3</strong>
             </span>
           </div>
 

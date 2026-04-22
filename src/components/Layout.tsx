@@ -108,7 +108,7 @@ const NAV_ITEMS: NavItem[] = [
   { label: 'ネタ帳', to: '/episodes', icon: <IconLightbulb />, disabled: true },
   { label: 'ノート', to: '/notes', icon: <IconBook /> },
   { label: 'クイズ', to: '/quiz', icon: <IconQuestion /> },
-  { label: '進捗トラッカー', to: '/tracker', icon: <IconChart />, disabled: true },
+  { label: '進捗トラッカー', to: '/tracker', icon: <IconChart /> },
 ]
 
 const STORAGE_KEY = 'pm_sidebar_open'

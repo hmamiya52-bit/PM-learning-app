@@ -7,6 +7,7 @@ import Afternoon1Answer from './pages/Afternoon1Answer'
 import Notes from './pages/Notes'
 import NoteDetail from './pages/NoteDetail'
 import Quiz from './pages/Quiz'
+import Tracker from './pages/Tracker'
 
 export default function App() {
   return (
@@ -20,6 +21,7 @@ export default function App() {
           <Route path="/notes" element={<Notes />} />
           <Route path="/notes/:categoryId" element={<NoteDetail />} />
           <Route path="/quiz" element={<Quiz />} />
+          <Route path="/tracker" element={<Tracker />} />
         </Route>
       </Routes>
     </BrowserRouter>
