@@ -108,3 +108,79 @@ export interface QuizAttempt {
   pickedIndex: number
   timeMs?: number
 }
+
+// ------------------------------------------------------------
+// 午後II（論述）
+// ------------------------------------------------------------
+
+/**
+ * 午後II 問題メタデータ
+ */
+export interface Afternoon2Problem {
+  id: string             // e.g. 'R7-PM2-1'
+  year: string
+  yearLabel: string
+  number: 1 | 2
+  title: string
+  theme: string          // 論述テーマ（要約）
+  keywords: string[]
+  /** 設問ア〜ウの指示文 */
+  promptA: string
+  promptB: string
+  promptC: string
+  questionPdfUrl?: string
+}
+
+/** 設問の章立て */
+export type EssaySection = 'a' | 'b' | 'c'
+
+/**
+ * 論述ドラフト（章ごとのテキストを保存）
+ */
+export interface EssayDraft {
+  id: string             // = problemId
+  problemId: string
+  sectionA: string
+  sectionB: string
+  sectionC: string
+  updatedAt: string      // ISO datetime
+  elapsedSec?: number    // 累計経過秒（タイマー）
+}
+
+// ------------------------------------------------------------
+// ネタ帳（エピソード管理）
+// ------------------------------------------------------------
+
+/**
+ * エピソードがカバーするPM領域タグ
+ */
+export type EpisodeTag =
+  | 'integration'
+  | 'scope'
+  | 'schedule'
+  | 'cost'
+  | 'quality'
+  | 'resource'
+  | 'communication'
+  | 'risk'
+  | 'procurement'
+  | 'stakeholder'
+  | 'agile'
+  | 'other'
+
+/**
+ * 論文のネタになるプロジェクト経験 1件
+ */
+export interface Episode {
+  id: string
+  title: string                  // 「基幹システム刷新」など
+  projectOverview: string        // プロジェクト概要（設問ア用）
+  role: string                   // 自身の立場・役割
+  problem: string                // 直面した課題
+  action: string                 // 実施した施策・工夫
+  result: string                 // 結果・評価
+  lesson?: string                // 学び・振り返り
+  tags: EpisodeTag[]             // 適用できるPM領域
+  createdAt: string              // ISO datetime
+  updatedAt: string              // ISO datetime
+}

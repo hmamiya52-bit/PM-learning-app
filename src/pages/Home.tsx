@@ -109,7 +109,7 @@ const FEATURES: Feature[] = [
     title: '進捗トラッカー',
     description: 'スコア履歴・学習計画を一元管理し成績推移を可視化',
     icon: (cls) => <IconChart className={cls} />,
-    status: 'available',
+    status: 'done',
     to: '/tracker',
   },
   {
@@ -117,14 +117,16 @@ const FEATURES: Feature[] = [
     title: '午後II 論述トレーニング',
     description: '設問ア・イ・ウの文字数カウント/タイマーで論文を練習',
     icon: (cls) => <IconEdit className={cls} />,
-    status: 'planned',
+    status: 'available',
+    to: '/afternoon2',
   },
   {
     phase: 'Phase 4',
     title: 'ネタ帳（エピソード管理）',
     description: '自分のプロジェクト経験を登録。テーマに使える経験ストックを蓄積',
     icon: (cls) => <IconLightbulb className={cls} />,
-    status: 'planned',
+    status: 'available',
+    to: '/episodes',
   },
 ]
 
@@ -224,7 +226,7 @@ export default function Home() {
               実装ロードマップ
             </h2>
             <span className="text-[11px] text-slate-500">
-              現在: <strong style={{ color: THEME.primary }}>Phase 3</strong>
+              現在: <strong style={{ color: THEME.primary }}>Phase 4</strong>
             </span>
           </div>
 

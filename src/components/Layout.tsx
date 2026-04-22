@@ -104,8 +104,8 @@ function IconClose() {
 const NAV_ITEMS: NavItem[] = [
   { label: 'ホーム', to: '/', icon: <IconHouse /> },
   { label: '午後I 演習', to: '/afternoon1', icon: <IconFileText /> },
-  { label: '午後II 論述', to: '/afternoon2', icon: <IconEdit />, disabled: true },
-  { label: 'ネタ帳', to: '/episodes', icon: <IconLightbulb />, disabled: true },
+  { label: '午後II 論述', to: '/afternoon2', icon: <IconEdit /> },
+  { label: 'ネタ帳', to: '/episodes', icon: <IconLightbulb /> },
   { label: 'ノート', to: '/notes', icon: <IconBook /> },
   { label: 'クイズ', to: '/quiz', icon: <IconQuestion /> },
   { label: '進捗トラッカー', to: '/tracker', icon: <IconChart /> },
